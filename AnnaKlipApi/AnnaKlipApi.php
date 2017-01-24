@@ -5,7 +5,7 @@ namespace AnnaKlipApi;
 use Shopware\Components\Plugin;
 
 /**
- * @author
+ * @author Anna Sophia Sommer <sommer@basecom.de>
  */
 class AnnaKlipApi extends Plugin
 {

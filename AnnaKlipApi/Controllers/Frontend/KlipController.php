@@ -3,7 +3,7 @@
 use Shopware\Components\CSRFWhitelistAware;
 /**
  * Class Shopware_Controllers_Api_Klip
- * @author
+ * @author Anna Sophia Sommer <sommer@basecom.de>
  */
 class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action implements CSRFWhitelistAware
 {

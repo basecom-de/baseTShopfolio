@@ -3,7 +3,7 @@
 namespace AnnaKlipApi\Components\Service;
 
 /**
- * @author
+ * @author Anna Sophia Sommer <sommer@basecom.de>
  */
 class DataTransformer
 {
