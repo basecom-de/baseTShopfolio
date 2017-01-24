@@ -1,14 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: basecom
- * Date: 09.12.16
- * Time: 09:59
- */
+
 namespace AnnaKlipApi;
 
 use Shopware\Components\Plugin;
 
+/**
+ * @author
+ */
 class AnnaKlipApi extends Plugin
 {
 
@@ -17,7 +15,7 @@ class AnnaKlipApi extends Plugin
      */
     public static function getSubscribedEvents()
     {
-        //Bei Aufruf der URL/klip wird Funktion ausgeführt
+        //After calling URL/klip function onGetControllerPath is carried out
         return [
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_Klip' => 'onGetControllerPath',
             'Enlight_Controller_Action_PostDispatch_Backend_Index' => 'onPostDispatchBackendIndex'
@@ -29,16 +27,16 @@ class AnnaKlipApi extends Plugin
      */
     public function onGetControllerPath()
     {
-        //Authorization checken, wenn nicht, dann Aufforderung zum Authorisieren
+        //checks if user is authorized, if not asks User to authorize himself
         if ( !isset($_SERVER['PHP_AUTH_USER']) ) {
             header('WWW-Authenticate: Basic realm="You Shall Not Pass"');
             header('HTTP/1.0 401 Unauthorized');
             exit;
         }
-        //Aufforderung zum Authorisieren, erst nachsehen od Username vorhanden, dann gucken ob Passwort (API key) passt, wenn passt, weiter zum Controller,
-        //wenn nicht Nachricht von falscher Authentifizierung
+        //request to the user to authorize himself, checks first if username in user database, then if password(API-Key) fits with username, if yes
+        // Controller is called, if not message that authentication failed
         else {
-            if ( $this->getUsername($_SERVER['PHP_AUTH_USER'])==true && $this->getPasswort($_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW'])==true ) {
+            if ( $this->getUsername($_SERVER['PHP_AUTH_USER'])==true && $this->getPassword($_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW'])==true ) {
                 return __DIR__ . '/Controllers/Frontend/KlipController.php';
             }
             else {
@@ -61,7 +59,11 @@ class AnnaKlipApi extends Plugin
 
     }
 
-    //checken, ob Username in Datenbank vorhanden
+    //checken, if username in database
+    /**
+     * @param $typedname
+     * @return bool
+     */
     private function getUsername($typedname)
     {
         $name='0';
@@ -87,8 +89,13 @@ class AnnaKlipApi extends Plugin
             return true;
     }
 
-    //Passwort mit Username vergleichen
-    private function getPasswort($username, $typedpasswort)
+    //chacks if password fits with the username
+    /**
+     * @param $username
+     * @param $typedpasswort
+     * @return bool
+     */
+    private function getPassword($username, $typedpasswort)
     {
         $sql = 'SELECT
         apiKey

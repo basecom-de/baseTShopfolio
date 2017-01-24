@@ -1,19 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: basecom
- * Date: 14.12.16
- * Time: 17:17
- */
 
 use Shopware\Components\CSRFWhitelistAware;
 /**
  * Class Shopware_Controllers_Api_Klip
- *
+ * @author
  */
 class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action implements CSRFWhitelistAware
 {
 
+    /**
+     * @return array
+     */
     public function getWhitelistedCSRFActions()
     {
         return [
@@ -21,6 +18,9 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         ];
     }
 
+    /**
+     * @return string
+     */
     private function getRequestedFormat()
     {
         return (string) $this->Request()->getParam('output');
@@ -40,52 +40,53 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         $result=null;
         $requestedData=$this->getRequestedData();
 
-        //alle Infos auf einmal
+        //get all available content
         if ($requestedData==null)
         {
-            //Verkäufe
-            $result['anzahlBestellungenLetzte30TageProTag'] = $this->getSalesMonthPerDay('30', '0');
-            $result['anzahlBestellungenLetzte30TageGesamt']=$this->getSalesPerMonth('30','0');
-            $result['anzahlBestellungenLetzte30-60TageProTag'] = $this->getSalesMonthPerDay('60', '0');
-            $result['anzahlBestellungenLetzte30-60TageGesamt']=$this->getSalesPerMonth('60', '30');
-            $result['anzahlBestellungenHeute'] = $this->getSalesPerMonth('1', '0');
-            //Umsätze
+            //sales
+            $result['salesThisMonthPerDay'] = $this->getSalesMonthPerDay('30', '0');
+            $result['salesThisMonthOverall']=$this->getSalesPerMonth('30','0');
+            $result['salesLastMonthPerDay'] = $this->getSalesMonthPerDay('60', '0');
+            $result['salesLastMonthOverall']=$this->getSalesPerMonth('60', '30');
+            $result['salesToday'] = $this->getSalesPerMonth('1', '0');
 
-            //Durchschnitt
-            $result['warenkorbWertDurchschnittLetzte30Tage'] = $this->getOrderbasketAverageDayMonth('30', '0');
-            $result['warenkorbWertDurchschnittLetzte60-30Tage'] = $this->getOrderbasketAverageDayMonth('60', '30');
-            $result['umsatzProTagDurchschnittNetto']=$this->getTurnoverperDay();
+            //turnovers
 
-            //Entwicklung
-            $result['umsatzLetzte30Tage'] = $this->getTurnoverPerMonth();
-            $result['umsatzProJahr']=$this->getTurnoverPerYear();
+            //average
+            $result['orderBasketAverageThisMonth'] = $this->getOrderbasketAverageDayMonth('30', '0');
+            $result['orderBasketAverageLastMonth'] = $this->getOrderbasketAverageDayMonth('60', '30');
+            $result['turnoverAveragePerDayNetto']=$this->getTurnoverperDay();
 
-            //andere Kriterien
-            $result['umsatzProKundeImJahr']=$this->getTurnoverClientYear();
-            $result['durchschnittsumsatzProKunde']= $this->getTurnoverPerCustomer();
-            $result['umsatzProVersandart']=$this->getTurnoverPerShipment();
-            $result['umsatzProZahlart']=$this->getTurnoverPerPayment();
-            $result['umsatzGesamt'] = $this->getTurnover();
+            //development
+            $result['turnoverThisMonth'] = $this->getTurnoverPerMonth();
+            $result['turnoverPerYear']=$this->getTurnoverPerYear();
 
-            //Bestellungen
-            $result['durchschnittswertBestellungen']= $this->getAverageOrderValue();
-            $result['durchschnittlicheAnzahlBestellungenProKunde']=$this->getOrderPerCustomer();
-            $result['anzahlBestellungen']=$this->getNumberOrders();
-            $result['anzahlBestellungenInBearbeitung']=$this->getNumberOrdersProcess();
+            //other criteria
+            $result['turnoverPerClientYear']=$this->getTurnoverClientYear();
+            $result['turnoverAveragePerCustomer']= $this->getTurnoverPerCustomer();
+            $result['turnoverPerShipment']=$this->getTurnoverPerShipment();
+            $result['turnoverPerPayment']=$this->getTurnoverPerPayment();
+            $result['turnoverOverall'] = $this->getTurnover();
 
-            //Artikel
-            $result['verkaufteStückzahlProTag']=$this->getSoldPiecesDay();
-            $result['durchschnittlichVerkaufteStückzahlProTag']=$this->getSoldPiecesDayAverage();
-            $result['durchschnittspreisVerkaufterArtikel']= $this->getAveragePriceSoldArticle();
+            //orders
+            $result['averageNumberOrders']= $this->getAverageOrderValue();
+            $result['averageNumberOrdersPerCustome']=$this->getOrderPerCustomer();
+            $result['numberOrders']=$this->getNumberOrders();
+            $result['numberOrdersInProcess']=$this->getNumberOrdersProcess();
 
-            //Kunden
-            $result['anzahlNeuerKunden']=$this->getNumberNewClients();
-            $result['anzahlBestandskunden']=$this->getNumberReturnedClients();
+            //articles
+            $result['soldPiecesPerDay']=$this->getSoldPiecesDay();
+            $result['averageSoldPiecesPerDay']=$this->getSoldPiecesDayAverage();
+            $result['averagePriceSoldPiecesl']= $this->getAveragePriceSoldArticle();
+
+            //customers
+            $result['numberNewCustomers']=$this->getNumberNewClients();
+            $result['numberReturnedCustomers']=$this->getNumberReturnedClients();
 
             //TopTen
-            $result['topTenArtikelNachUmsatz']=$this->getTopTenArticleTurnover();
-            $result['topTenArtikelVerkaufteStückzahl']=$this->getTopTenArticlePiece();
-            $result['topTenKundenNachUmsatz']=$this->getTopTenClientTurnover();
+            $result['topTenArticleTurnover']=$this->getTopTenArticleTurnover();
+            $result['topTenArticleSoldPieces']=$this->getTopTenArticlePiece();
+            $result['topTenCustomersTurnover']=$this->getTopTenClientTurnover();
 
 
 
@@ -95,94 +96,94 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
 
 
-                //Bestellungen
+                //orders
 
-                    //Anzahl Bestellungen der letzten 0-30 Tage</
+                    //quantity of orders in the last 30 days per day
                     case 'salesthismonthperday':
                         $result = $this->getSalesMonthPerDay('30', '0');
                         break;
 
-                    //Anzahl der letzten 30 Tage insgesammt </
+                    //quantity of orders in the last 30 days overall
                     case 'salesthismonth':
                         $result=$this->getSalesPerMonth('30', '0');
                         break;
 
-                    //Anzahl Bestellungen der letzten 30-60 Tage </
+                    //quantity of sales in the last 30-60 days per day
                     case 'saleslastmonthperday':
                         $result = $this->getSalesMonthPerDay('60', '30');
                         break;
 
-                    //Anzahl der letzten 30-60 Tage insgesammt </
+                    //quantity of sales in the last 30 - 60 days overall
                     case 'saleslastmonth':
                         $result=$this->getSalesPerMonth('60', '30');
                         break;
 
-                    //Anzahl Bestellungen heute </
+                    //quantity orders today
                     case 'salestoday':
                         $result = $this->getSalesPerMonth('1', '0');
                         break;
 
                 //-------------------------------------------------------------------------------------------------
 
-                //Umsatz
+                //turnover
 
 
-                    //Durchschnittsumsatz
+                    //average
 
-                        //Warenkorbwert der letzten 30 Tage durchschnitt </
+                        //order basket value average last 30 days
                         case 'orderbasketaveragepermonth':
                             $result = $this->getOrderbasketAverageDayMonth('30', '0');
                             break;
 
-                        //Warenkorbwert der letzten 30-60 Tage </
+                        //order basket value average last 30-60 days
                         case 'orderbasketaveragelastmonth':
                             $result = $this->getOrderbasketAverageDayMonth('60', '30');
                             break;
 
-                        //durchschnittl. Umsatz pro Tag Netto </
+                        //turnover average per day netto
                         case 'turnoverperdaynetto':
                             $result=$this->getTurnoverperDay();
                             break;
 
                 //---------------------------------------------------------------------------------
 
-                    //Umsatzentwicklungen
+                    //turnover development
 
-                        //Umsatzentwicklung je Tag der letzten 30 Tage als Kurve (Liste der Umsätze je Tag) </
+                        //turnoverdevelopment per day last 30 days
                         case 'turnoverpermonth':
                             $result = $this->getTurnoverPerMonth();
                             break;
 
-                        //Umsatz pro Jahr </
+                        //turnover per yeas
                         case 'turnoverperyear':
                             $result=$this->getTurnoverPerYear();
                             break;
 
                 //----------------------------------------------------------------------------
 
-                    //Umsatz nach anderen Kriterien
+                    //turnover other criterias
 
-                        //Umsatz pro Kunde im Jahr </
+                        //turnover per client per year
                         case 'turnoverperclientyear':
                             $result=$this->getTurnoverClientYear();
                             break;
 
-                        //Durchschnittsumsatz pro Kunde </
+                        //turnover average per customer
                         case 'turnoverpercustomer':
                             $result= $this->getTurnoverPerCustomer();
                             break;
 
-                        //Umsatz pro Versandart </
+                        //turnover per shippment
                         case 'turnoverpershipment':
                             $result=$this->getTurnoverPerShipment();
                             break;
 
-                        //Umsatz pro Zahlart </
+                        //turnover per payment
                         case 'turnoverperpayment':
                             $result=$this->getTurnoverPerPayment();
                             break;
 
-                    //Umsatz Gesamt </
+                        //turnover all time
                         case 'turnoveralltime':
                             $result = $this->getTurnover();
                             break;
@@ -190,28 +191,28 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
                 //-----------------------------------------------------------------------
 
-                //Bestellungen
+                //orders
 
-                    //Durchschnitt
+                    //average
 
-                        //Durchschnittswert der Bestellungen </
+                        //average order value
                         case 'averageordervalue':
                             $result= $this->getAverageOrderValue();
                             break;
 
-                        //Durchschnittliche Anzahl Bestellungen pro Kunde
+                        //average quantity orders per customer
                         case 'averagenumberorderpercustomer':
                             $result= $this->getOrderPerCustomer();
                             break;
 
-                    //Anzahl
+                    //quantity
 
-                        //Anzahl der Bestellungen </
+                        //quantity orders per status
                         case 'numberorders':
                             $result=$this->getNumberOrders();
                             break;
 
-                        //Anzahl Bestellungen in Bearbeitung </
+                        //quantity orders 'in process'
                         case 'numberordersprocess':
                             $result=$this->getNumberOrdersProcess();
                             break;
@@ -219,35 +220,35 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
                 //--------------------------------------------------------------------------------
 
-                //Artikel
+                //articles
 
-                    //verkaufte Stückzahl pro Tag </
+                    //sold articles per day
                     case 'soldpiecesday':
                         $result=$this->getSoldPiecesDay();
                         break;
 
 
-                    //durchschnittl. verkaufte Stückzahl pro Tag </
+                    //average sold articles per day
                     case 'averagesoldpiecesday':
                         $result=$this->getSoldPiecesDayAverage();
                         break;
 
 
-                    //Durchschnittspreis verkaufter Artikel </
+                    //average price sold articles
                     case 'averagepricesoldarticle':
                         $result= $this->getAveragePriceSoldArticle();
                         break;
 
                 //-------------------------------------------------------------------
 
-                //Kunden
+                //customers
 
-                    //Anzahl neuer Kunden </
+                    //quantity new customers
                     case 'numbernewclients':
                         $result=$this->getNumberNewClients();
                         break;
 
-                    //Anzahl Bestandskunden </
+                    //quantity returned customers
                     case 'numberreturnedclients':
                         $result=$this->getNumberReturnedClients();
                         break;
@@ -256,17 +257,17 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
                 //Top Ten
 
-                    //Top Ten Artikel Umsatz
+                    //Top Ten Article per turnover
                     case 'toptenarticleturnover':
                         $result=$this->getTopTenArticleTurnover();
                         break;
 
-                    //Top Ten Artikel pro Stück
+                    //Top Ten Article per piece
                     case 'toptenarticlepiece':
                         $result=$this->getTopTenArticlePiece();
                         break;
 
-                    //Top Ten Kunden Umsatz
+                    //Top Ten customers per turnover
                     case 'toptencustomerturnover':
                         $result=$this->getTopTenClientTurnover();
                         break;
@@ -276,7 +277,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         }
 
 
-        //Ergebnis in gewünschtes Format
+        //result in given format or (if no format given) in json
         $format=$this->getRequestedFormat();
         if($format==null)
             $format='json';
@@ -293,9 +294,14 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
     //-----------------------------------------------------------------------
 
-    //Verkäufe
+    //sales
 
-    //Verkäufe pro Tag
+    //sales per day
+    /**
+     * @param $from
+     * @param $to
+     * @return mixed
+     */
     public function getSalesMonthPerDay($from, $to)
     {
         $now=new DateTime();
@@ -303,7 +309,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         $now->modify('-'.$to.' days');
         $then->modify('-'.$from.' days');
 
-        //Alle Aufträge
+        //all orders
         $sql='SELECT COUNT(*) as ordercount, CONVERT(ordertime, DATE) as date
         FROM s_order
         WHERE ordertime<"'.$now->format('Y-m-d H:i:s').'" AND ordertime>"'.$then->format('Y-m-d H:i:s').'"
@@ -311,7 +317,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         ORDER BY ordertime';
         $sales= $this->query($sql);
 
-        //gecancellte Aufträge
+        //cancelled orders
         $sql='SELECT COUNT(*) as ordercount, CONVERT(ordertime, DATE) as date
         FROM s_order
         WHERE status=-1 AND ordertime<"'.$now->format('Y-m-d H:i:s').'" AND ordertime>"'.$then->format('Y-m-d H:i:s').'"
@@ -332,10 +338,15 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Verkäufe im gewählten Zeitraum insgesammt
+    //sales in given time overall
+    /**
+     * @param $from
+     * @param $to
+     * @return mixed
+     */
     public function getSalesPerMonth($from, $to)
     {
-        //Tägliche Anzahl an Verkäufen im Zeitraum von einem Monat
+        //daily quantity of orders in given time
         $now=new DateTime();
         $then=new DateTime();
         $now->modify('-'.$to.' days');
@@ -363,9 +374,14 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
     }
     //--------------------------------------------------------------------------------------------------
 
-    //Umsatz/ Warenkorb im Monat
+    //turnover/ order basket
 
-    //Warenkorbwert Durchschnitt pro Tag in einem Monat
+    //average order basket value per day per month
+    /**
+     * @param $startdate
+     * @param $enddate
+     * @return mixed
+     */
     public function getOrderbasketAverageDayMonth($startdate, $enddate)
     {
         $then=new DateTime();
@@ -373,7 +389,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         $then=$then->modify('-'.$startdate.' days')->format('Y-m-d H:i:s');
         $now=$now->modify('-'.$enddate.' days')->format('Y-m-d H:i:s');
 
-        //Differenz aus summiertem Preis der Artikel und anzahl der unterschiedlichen Sessions in den letzten 30 Tagen
+        //difference from sum of the articles an number of different sessions in the given time
         $sql='
         SELECT SUM(price)/COUNT(DISTINCT sessionID)
         FROM
@@ -387,7 +403,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //durchschnittl.  Umsatz pro Tag Netto
+    //average turnover per day netto
+    /**
+     * @return mixed
+     */
     public function getTurnoverperDay()
     {
         $Date=$this->getDate('30', 'Y-m-d H:i:s');
@@ -408,9 +427,12 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
     //-------------
 
-    //Umsatzentwicklung
+    //development turnover
 
-    //Umsatz im Monat
+    //turnover per month
+    /**
+     * @return mixed
+     */
     public function getTurnoverPerMonth()
     {
         $then=new DateTime();
@@ -429,7 +451,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Umsatz pro Jahr
+    //turnover per year
+    /**
+     * @return mixed
+     */
     public function getTurnoverPerYear()
     {
         $sql='SELECT
@@ -446,14 +471,17 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
     //-----------------
 
-    //Umsatz nach anderen Kriterien
+    //turnover other criterias
 
-    //Durchschnittskundenumsatz pro Jahr
+    //average turnover per customer per year
+    /**
+     * @return mixed
+     */
     public function getTurnoverClientYear()
     {
         $orders=$this->getTurnoverPerYear()['turnoverPerYear'];
 
-        //Anzahl der Kunden abhängig vom Jahr des Beitritts
+       //quantity of customers depending on their first log in
         $sql='SELECT COUNT(id) AS Number, YEAR(firstlogin) AS Year
         FROM s_user
         GROUP BY YEAR(firstlogin)
@@ -464,11 +492,11 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         $p=0;
         $usersall=0;
 
-        //Durchgehen der Jahre ausgehend vom ersten Jahr mit Kunde
+        //Loop through the years beginning with first customer
         for($i=$users[0]['Year']; $i<=$orders[count($orders)-1]['Year']; $i++) {
             $userdate=$i;
 
-            //Anzahl der neuen Kunden mit denen vom Vorjar, die ja erhalten sind
+            //add new customers this year to customers last year
             for($j=0; $j<count($users); $j++) {
                 if($users[$j]['Year']==$userdate) {
                     $usersall+=$users[$j]['Number'];
@@ -477,6 +505,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
             }
 
             //Aufträge durchgehen und durch anzahl der Kunden bis zu diesem Jahr teilen
+            //loop through orders and devide through customers this year
             for($j=0; $j<count($orders); $j++) {
                 if($userdate==$orders[$j]['Year']) {
                     $turnover[$p]['Year']=$userdate;
@@ -490,7 +519,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Durchschnittsumsatz Kunden
+    //average turnover per customer
+    /**
+     * @return mixed
+     */
     public function getTurnoverPerCustomer()
     {
         $turnover=$this->getTurnover()['turnoverAllTime'];
@@ -506,10 +538,13 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Umsatz pro Versandart
+    //turnover per shippment
+    /**
+     * @return mixed
+     */
     public function getTurnoverPerShipment()
     {
-        //Umsatz nach Versandart
+        //turnover per shippment
         $sql = '
         SELECT
           SUM(invoice_amount) AS invoice, dispatchID
@@ -519,7 +554,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
         $invoice=$this->query($sql);
 
-        //Name der Versandart
+        //name of shippment
         for($i=0; $i<count($invoice); $i++) {
             $sql='SELECT name
             FROM s_premium_dispatch
@@ -528,14 +563,17 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
             $invoice[$i]['name']=$name[0]['name'];
         }
 
-        $result['turnoverpershippment']=$invoice;
+        $result['turnoverPerShippment']=$invoice;
         return $result;
     }
 
-    //Umsatz pro Zahlart
+    //turnover per payment
+    /**
+     * @return mixed
+     */
     public function getTurnoverPerPayment()
     {
-        //Umsatz nach Zahlart
+        //turnover per payment
         $sql = '
         SELECT
           SUM(invoice_amount) AS invoice, paymentID
@@ -544,7 +582,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         GROUP BY orders.paymentID';
         $invoice=$this->query($sql);
 
-        //Name der Zahlart
+        //name of payment
         for($i=0; $i<count($invoice); $i++) {
             $sql='SELECT name
             FROM s_core_paymentmeans
@@ -553,12 +591,15 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
             $invoice[$i]['name']=$name[0]['name'];
         }
 
-        $result['turnoverperpayment']=$invoice;
+        $result['turnoverPerPayment']=$invoice;
         return $result;
     }
 
 
-    //Suche Umsatz insgesammt
+    //turnover all time
+    /**
+     * @return mixed
+     */
     public function getTurnover()
     {
         $sql="
@@ -581,9 +622,12 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
     //--------------------------------------------------------------------------------------------------
 
 
-    //Bestellungen
+    //orders
 
-    //Durchschnittswert der Bestellungen
+    //average order value
+    /**
+     * @return mixed
+     */
     public function getAverageOrderValue()
     {
         $sql="
@@ -598,7 +642,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Durchschnittliche Anzahl Bestellungen pro Kunde
+    //average quantity of orders per customer
+    /**
+     * @return mixed
+     */
     public function getOrderPerCustomer()
     {
         $sql='
@@ -614,10 +661,13 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Anzahl Bestellungen
+    //quantity of orders per state
+    /**
+     * @return mixed
+     */
     public function getNumberOrders()
     {
-        //Alle benutzten Statuse und Anzahl der Bestellungen im Status
+        //all used states and quantity of orders in this state
         $sql='
         SELECT
             COUNT(status) AS number, status
@@ -627,7 +677,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         $orders=$this->query($sql);
         $all=0;
 
-        //Namen des Status
+        //name of the state
         for($i=0; $i<count($orders); $i++) {
             $number=$orders[$i]['number'];
             $all+=$number;
@@ -652,7 +702,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Anzahl Bestellungen 'in Arbeit'
+    //quantity of orders 'in process'
+    /**
+     * @return mixed
+     */
     public function getNumberOrdersProcess()
     {
         $sql='
@@ -672,9 +725,12 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
     //--------------------------------------------------------------------------
 
-    //Artikel
+    //Articles
 
-    //Verkaufte Stückzahl pro Tag !!!!!!!!!!!!!!!!!!!!!!!
+    //sold articles per day
+    /**
+     * @return mixed
+     */
     public function getSoldPiecesDay()
     {
         $Date=$this->getDate('30', 'Y-m-d H:i:s');
@@ -695,7 +751,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //durchschnittl. verkaufte Stückzahl pro Tag
+    //average sold articles per day
+    /**
+     * @return mixed
+     */
     public function getSoldPiecesDayAverage()
     {
         $soldpieces=$this->getSoldPiecesDay();
@@ -713,7 +772,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
 
 
-    //Durchschnittspreis verkaufter Artikel
+    //average price sold articles
+    /**
+     * @return mixed
+     */
     private function getAveragePriceSoldArticle()
     {
         $sql="
@@ -731,9 +793,12 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
     }
     //----------------------------------------------------------------------
 
-    //Kunden
+    //customers
 
-    //Anzahl neuer Kunden
+    //quantity new customers
+    /**
+     * @return mixed
+     */
     public function getNumberNewClients()
     {
         $then=new DateTime();
@@ -753,7 +818,10 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Anzahl Bestandskunden
+    //quantity returned customers
+    /**
+     * @return mixed
+     */
     public function getNumberReturnedClients()
     {
         $sql='
@@ -769,13 +837,16 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
     //---------------------------------------------------------------------------------
 
-    //Top Tens
+    //Top Ten
 
 
-    //Top Ten Artikel Umsatz
+    //Top Ten article turnover
+    /**
+     * @return mixed
+     */
     public function getTopTenArticleTurnover()
     {
-        //errechne Umsatz aus Preis und Anzahl Verkäufe, Ordne nach Umsatz, gib erste 10 aus mit Name, id, Umsatz
+        //calculate turnover from price and quantity of times sold, order after turnover return first ten with name id and turnover
         $sql='SELECT DISTINCT price.articleID, price.price * sales.sales AS turnover, article.name
         FROM s_articles_top_seller_ro AS sales, s_articles_prices AS price, s_articles AS article
         WHERE price.articleID=sales.article_id AND price.articleID=article.id
@@ -787,11 +858,14 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $result;
     }
 
-    //Top Ten Artikel Stück
+    //Top Ten articles sold pieces
+    /**
+     * @return mixed
+     */
     public function getTopTenArticlePiece()
     {
 
-        //Anzahl an Verkäufen pro Artikel
+        //quantity of times sold per article
         $sql='SELECT
         sales, article_id
         FROM s_articles_top_seller_ro
@@ -802,7 +876,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
         for($i=0; $i<count($articles);$i++)
         {
-            //Name der Artikel
+            //name of the article
             $sql='SELECT name FROM s_articles WHERE id="'.$articles[$i]['article_id'].'"';
             $name=$this->query($sql);
             $articles[$i]['name']=$name[0]['name'];
@@ -813,10 +887,13 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
     }
 
 
-    //Top Ten Kunden Umsatz
+    //Top Ten customers turnover
+    /**
+     * @return mixed
+     */
     public function getTopTenClientTurnover()
     {
-        //Umsatz pro Kunden
+        //turnover per customer
         $sql='
         SELECT
             userID, SUM(orders.invoice_amount / orders.currencyFactor) as turnover
@@ -827,7 +904,7 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         LIMIT 10';
         $turnover=$this->query($sql);
 
-        //Name des Kunden
+        //name of customer
         for($i=0; $i<count($turnover); $i++)
         {
             $id=$turnover[$i]['userID'];
@@ -844,9 +921,14 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
 
     //---------------------------------------------------------------------
 
-    //Hilfsfunktionen
+    //useful functions
 
-    //Datum in das richtige Format setzen
+    //get date in right format
+    /**
+     * @param $timeFromNow
+     * @param $format
+     * @return DateTime|mixed|string
+     */
     public function getDate($timeFromNow, $format)
     {
         $Date = $this->Request()->getParam('startdate', date("Y-m-d"));
@@ -858,7 +940,13 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $Date;
     }
 
-    //Datum in Format setzen
+    //get date in format
+    /**
+     * @param $date
+     * @param $format
+     * @param $finale
+     * @return DateTime|string
+     */
     public function getDateFormat($date, $format, $finale)
     {
         $date=DateTime::createFromFormat($format, $date);
@@ -867,7 +955,13 @@ class Shopware_Controllers_Frontend_Klip extends Enlight_Controller_Action imple
         return $date;
     }
 
-    //Datenbank durchsuchen
+    //query the database
+    /**
+     * @param $sql
+     * @param $startdate
+     * @param $enddate
+     * @return array
+     */
     public function query($sql, $startdate, $enddate)
     {
         if ($startdate==null&&$enddate==null)
