@@ -1,13 +1,13 @@
 <?php
 
-namespace AnnaKlipApi;
+namespace baseTShopfolio;
 
 use Shopware\Components\Plugin;
 
 /**
  * @author Anna Sophia Sommer <sommer@basecom.de>
  */
-class AnnaKlipApi extends Plugin
+class baseTShopfolio extends Plugin
 {
 
     /**

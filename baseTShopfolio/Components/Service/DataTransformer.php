@@ -1,6 +1,6 @@
 <?php
 
-namespace AnnaKlipApi\Components\Service;
+namespace baseTShopfolio\Components\Service;
 
 /**
  * @author Anna Sophia Sommer <sommer@basecom.de>
