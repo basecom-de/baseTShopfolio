@@ -1,6 +1,6 @@
 <?php
 
-namespace baseTShopfolio\Components\Service;
+namespace basecom\Components\Service;
 
 /**
  * @author Anna Sophia Sommer <sommer@basecom.de>

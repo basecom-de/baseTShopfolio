@@ -3,7 +3,7 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="base_t_shopfolio.data_transformer"
+        <service id="basecom.data_transformer"
                  class="baseTShopfolio\Components\Service\DataTransformer">
         </service>
     </services>
